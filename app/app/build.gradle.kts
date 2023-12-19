@@ -90,4 +90,6 @@ dependencies {
     implementation("io.ktor:ktor-client-websockets:2.3.6")
     implementation("io.ktor:ktor-serialization-kotlinx-json:2.3.6")
     implementation("io.ktor:ktor-client-content-negotiation:2.3.6")
+
+    implementation("io.coil-kt:coil-compose:2.1.0")
 }

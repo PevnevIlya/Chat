@@ -1,6 +1,7 @@
 package com.example.myapplication.di
 
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.myapplication.data.implementations.ChangeInfoServiceImplementation
 import com.example.myapplication.data.implementations.LoginServiceImplementation
 import com.example.myapplication.data.implementations.RegistrationServiceImplementation
 import com.example.myapplication.domain.usecases.validate.email.ValidateEmail
@@ -33,6 +34,12 @@ object AppModule {
     @Singleton
     fun provideLoginService(client: HttpClient): LoginServiceImplementation {
         return LoginServiceImplementation(client)
+    }
+
+    @Provides
+    @Singleton
+    fun provideChangeInfoService(client: HttpClient): ChangeInfoServiceImplementation {
+        return ChangeInfoServiceImplementation(client)
     }
 
     @Provides
