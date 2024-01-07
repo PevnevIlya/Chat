@@ -70,8 +70,14 @@ fun MainScreen(
             hasNews = false
         )
     )
+    if(viewModel.goToSingleChat != "null"){
+        navController.navigate("${Screens.SingleChatScreen.route}/${viewModel.goToSingleChat}")
+    }
     if(viewModel.goToChangeInfoActivity){
         navController.navigate(Screens.ChangeInfoScreen.route)
+    }
+    if(viewModel.goToAddCompanionActivity){
+        navController.navigate(Screens.AddCompanionScreen.route)
     }
     Scaffold (
         bottomBar = {
@@ -103,8 +109,8 @@ fun MainScreen(
             }
         }
         ) {
-        if(viewModel.selectedItemIndex == 0) ChatsScreen()
+        if(viewModel.selectedItemIndex == 0) ChatsScreen(viewModel)
         if(viewModel.selectedItemIndex == 1) ProfileScreen(viewModel)
-        if(viewModel.selectedItemIndex == 2) SettingsScreen()
+        if(viewModel.selectedItemIndex == 2) SettingsScreen(viewModel)
     }
 }

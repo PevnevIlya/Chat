@@ -1,7 +1,11 @@
 package com.example.myapplication.presentation.fragments
 
+import android.util.Log
+import androidx.activity.result.PickVisualMediaRequest
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -12,19 +16,25 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.net.toUri
+import coil.compose.AsyncImage
 import com.example.myapplication.R
 import com.example.myapplication.presentation.composables.DefaultButton
 import com.example.myapplication.presentation.composables.DefaultText
 import com.example.myapplication.presentation.main.MainViewModel
+import com.squareup.picasso.Picasso
+import okhttp3.HttpUrl.Companion.toHttpUrl
 
 @Composable
 fun ProfileScreen(
@@ -38,23 +48,28 @@ fun ProfileScreen(
     ) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             Spacer(modifier = Modifier.height(75.dp))
-            Image(
+            AsyncImage(
+                model = viewModel.user.photoUrl.toString(),
+                contentDescription = "Photo",
                 modifier = Modifier
                     .size(150.dp)
                     .clip(CircleShape),
-                painter = painterResource(id = R.drawable.ic_launcher_background),
-                contentDescription = "Your photo")
+                contentScale = ContentScale.Crop
+            )
+            LaunchedEffect(viewModel.user.photoUrl) {
+
+            }
             Spacer(modifier = Modifier.height(50.dp))
             DefaultText(
                 modifier = Modifier.align(Alignment.CenterHorizontally),
-                text = "Your name", color = Color.Black,
+                text = viewModel.user.name.toString(), color = Color.Black,
                 fontSize = 22.sp,
                 fontFamily = FontFamily.Serif,
                 fontWeight = FontWeight.Bold)
             Spacer(modifier = Modifier.height(30.dp))
             DefaultText(
                 modifier = Modifier.align(Alignment.CenterHorizontally),
-                text = "Your status", color = Color.Gray,
+                text = viewModel.user.status.toString(), color = Color.Gray,
                 fontSize = 22.sp,
                 fontFamily = FontFamily.Serif,
                 fontWeight = FontWeight.Bold)

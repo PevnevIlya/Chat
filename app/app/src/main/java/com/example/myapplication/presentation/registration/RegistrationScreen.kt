@@ -32,6 +32,9 @@ fun RegistrationScreen(
     viewModel: RegistrationViewModel = hiltViewModel()
 ) {
     val context = LocalContext.current
+    if(viewModel.isRegistered){
+        navController.navigate(Screens.MainScreen.route)
+    }
     LaunchedEffect(key1 = context) {
         viewModel.validationEvents.collect { event ->
             when (event) {
@@ -61,7 +64,9 @@ fun RegistrationScreen(
         }
     }
 
-    if(!viewModel.isLoading) {
+    if(viewModel.isLoading) {
+        LoadingScreen()
+    } else {
         Box(
             modifier = Modifier
                 .fillMaxSize()
@@ -75,14 +80,14 @@ fun RegistrationScreen(
                         .width(150.dp),
                     text = "Enter email..",
                     color = Color.Gray,
-                    value = viewModel.state.email,
+                    value = viewModel.validationState.email,
                     onValueChange = {
-                        viewModel.onEvent(RegistrationFormEvent.EmailChanged(it))
+                        viewModel.onValidationEvent(RegistrationFormEvent.EmailChanged(it))
                     }
                 )
-                if (viewModel.state.emailError != null) {
+                if (viewModel.validationState.emailError != null) {
                     DefaultText(
-                        text = viewModel.state.emailError!!,
+                        text = viewModel.validationState.emailError!!,
                         color = Color.Red,
                         modifier = Modifier.align(Alignment.End)
                     )
@@ -95,15 +100,15 @@ fun RegistrationScreen(
                         .width(150.dp),
                     text = "Enter password..",
                     color = Color.Gray,
-                    value = viewModel.state.password,
+                    value = viewModel.validationState.password,
                     onValueChange = {
-                        viewModel.onEvent(RegistrationFormEvent.PasswordChanged(it))
+                        viewModel.onValidationEvent(RegistrationFormEvent.PasswordChanged(it))
                     },
-                    isError = viewModel.state.emailError != null
+                    isError = viewModel.validationState.emailError != null
                 )
-                if (viewModel.state.passwordError != null) {
+                if (viewModel.validationState.passwordError != null) {
                     DefaultText(
-                        text = viewModel.state.passwordError!!,
+                        text = viewModel.validationState.passwordError!!,
                         color = Color.Red,
                         modifier = Modifier.align(Alignment.End)
                     )
@@ -112,7 +117,7 @@ fun RegistrationScreen(
 
                 DefaultButton(
                     action = {
-                        viewModel.onEvent(RegistrationFormEvent.Submit)
+                        viewModel.onValidationEvent(RegistrationFormEvent.Submit)
                     },
                     modifier = Modifier
                         .height(45.dp)
@@ -139,7 +144,5 @@ fun RegistrationScreen(
                 )
             }
         }
-    } else {
-        LoadingScreen()
     }
 }

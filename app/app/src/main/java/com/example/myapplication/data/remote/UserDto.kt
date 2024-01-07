@@ -13,7 +13,7 @@ data class UserDto(
             id = "",
             email = email,
             password = password,
-            username = ""
+            name = ""
         )
     }
 }

@@ -1,8 +1,7 @@
 package com.example
 
 import com.example.di.mainModule
-import com.example.plugins.configureHTTP
-import com.example.plugins.configureRouting
+import com.example.plugins.configureCustomRouting
 import com.example.plugins.configureSerialization
 import io.ktor.server.application.Application
 import io.ktor.server.application.install
@@ -17,8 +16,7 @@ fun Application.module() {
         modules(mainModule)
     }
     configureSerialization()
-    configureHTTP()
-    configureRouting()
+    configureCustomRouting()
 }
 
 

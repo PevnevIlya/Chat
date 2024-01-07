@@ -13,4 +13,12 @@ fun Route.configureChangeInfoRouting(userController: UserController){
     post("/getUserInfo") {
         userController.getUserInfo(call)
     }
+
+    post("/addCompanionInList") {
+        userController.addCompanion(call)
+    }
+
+    post("/getUserCompanions") {
+        userController.getUserCompanions(call)
+    }
 }

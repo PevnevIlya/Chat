@@ -9,7 +9,7 @@ import io.ktor.server.application.install
 import io.ktor.server.routing.Routing
 import org.koin.ktor.ext.inject
 
-fun Application.configureRouting() {
+fun Application.configureCustomRouting() {
     val userController by inject<UserController>()
     install(Routing){
         configureRegisterRouting(userController)

@@ -8,4 +8,6 @@ sealed class Screens(val route: String){
     object ChatsScreen: Screens("chats_screen")
     object ProfileScreen: Screens("profile_screen")
     object SettingsScreen: Screens("settings_screen")
+    object AddCompanionScreen: Screens("add_companion_screen")
+    object SingleChatScreen: Screens("single_chat_screen")
 }

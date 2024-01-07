@@ -5,15 +5,26 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class ChangeInfoReceiveRemote(
     val email: String,
-    var username: String = "",
+    var name: String = "",
     var status: String = "",
     var photoUrl: String = ""
 )
 
 @Serializable
 data class ChangeInfoResponseRemote(
-    var username: String,
+    var name: String,
     var status: String,
     var photoUrl: String
+)
+
+@Serializable
+data class AddCompanionReceiveRemote(
+    val email: String,
+    val companionEmail: String
+)
+
+@Serializable
+data class GetUserCompanionsRemote(
+    val list: MutableList<String>
 )
 

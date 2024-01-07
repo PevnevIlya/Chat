@@ -6,5 +6,6 @@ data class UserModel(
     var email: String,
     var username: String = "",
     var status: String = "",
-    var photoUrl: String = ""
+    var photoUrl: String = "",
+    var companionEmails: MutableList<String> = mutableListOf()
 )

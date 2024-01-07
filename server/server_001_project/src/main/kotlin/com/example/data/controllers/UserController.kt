@@ -1,7 +1,9 @@
 package com.example.data.controllers
 
+import com.example.data.model.JSONmodels.AddCompanionReceiveRemote
 import com.example.data.model.JSONmodels.ChangeInfoReceiveRemote
 import com.example.data.model.JSONmodels.ChangeInfoResponseRemote
+import com.example.data.model.JSONmodels.GetUserCompanionsRemote
 import com.example.data.model.JSONmodels.ReceiveRemote
 import com.example.data.model.UserModel
 import com.example.utils.USERS_COLLECTION
@@ -64,7 +66,7 @@ class UserController(
         val user = collection.findOne(UserModel::email eq receive.email)
 
         if(user != null) {
-            user.username = receive.username
+            user.username = receive.name
             user.status = receive.status
             user.photoUrl = receive.photoUrl
 
@@ -82,6 +84,32 @@ class UserController(
 
         if(user != null) {
             val result = ChangeInfoResponseRemote(user.username, user.status, user.photoUrl)
+            call.respond(HttpStatusCode.OK, result)
+        } else {
+            call.respond(HttpStatusCode.NotFound, "User not found")
+        }
+    }
+
+    suspend fun addCompanion(call: ApplicationCall) {
+        val receive = call.receive<AddCompanionReceiveRemote>()
+        val collection = db.getCollection<UserModel>(USERS_COLLECTION)
+        val user = collection.findOne(UserModel::email eq receive.email)
+
+        if(user != null) {
+            user.companionEmails.add(receive.companionEmail)
+            collection.updateOne(UserModel::email eq receive.email, user)
+        } else {
+            call.respond(HttpStatusCode.NotFound, "User not found")
+        }
+    }
+
+    suspend fun getUserCompanions(call: ApplicationCall) {
+        val receive = call.receive<ChangeInfoReceiveRemote>()
+        val collection = db.getCollection<UserModel>(USERS_COLLECTION)
+        val user = collection.findOne(UserModel::email eq receive.email)
+
+        if(user != null) {
+            val result = GetUserCompanionsRemote(user.companionEmails)
             call.respond(HttpStatusCode.OK, result)
         } else {
             call.respond(HttpStatusCode.NotFound, "User not found")
