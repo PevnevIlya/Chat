@@ -49,7 +49,7 @@ fun ProfileScreen(
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             Spacer(modifier = Modifier.height(75.dp))
             AsyncImage(
-                model = viewModel.user.photoUrl.toString(),
+                model = viewModel.loadedBitmap.value,
                 contentDescription = "Photo",
                 modifier = Modifier
                     .size(150.dp)

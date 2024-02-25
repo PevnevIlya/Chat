@@ -1,42 +1,48 @@
 package com.example.myapplication.presentation.fragments
 
-import android.util.Log
+import android.graphics.Bitmap
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.text.ClickableText
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
 import com.example.myapplication.data.models.UserModel
 import com.example.myapplication.presentation.composables.CardWithImageAndText
 import com.example.myapplication.presentation.main.MainViewModel
-import kotlinx.coroutines.launch
 
 @Composable
 fun ChatsScreen(
     viewModel: MainViewModel
 ){
+    val placeholderColor = Color.Gray
+    val placeholderBitmap = remember {
+        Bitmap.createBitmap(150, 150, Bitmap.Config.ARGB_8888).apply {
+            eraseColor(placeholderColor.toArgb())
+        }
+    }
     LazyColumn {
         items(viewModel.user.companionsList) { item ->
             val user = remember(item) { mutableStateOf<UserModel?>(null) }
+            val newBitmap = remember(item) { mutableStateOf<Bitmap?>(null) }
             LaunchedEffect(item) {
                 val userInfo = viewModel.getUserInfo(item)
                 user.value = userInfo
-
             }
             user.value?.let { userModel ->
+                if (newBitmap.value == null) {
+                    viewModel.loadImageFromServer(userModel.photoUrl ?: "empty", newBitmap)
+                }
+
                 CardWithImageAndText(
-                    imageUrl = "empty",
+                    bitmap = newBitmap.value ?: placeholderBitmap,
                     text1 = userModel.name,
-                    text2 = userModel.status,
-                    action = {
-                        viewModel.goToSingleChat = item
-                    }
-                )
+                    text2 = userModel.status
+                ) {
+                    viewModel.goToSingleChat = item
+                }
             }
         }
     }

@@ -2,7 +2,9 @@ package com.example
 
 import com.example.di.mainModule
 import com.example.plugins.configureCustomRouting
+import com.example.plugins.configureSecurity
 import com.example.plugins.configureSerialization
+import com.example.plugins.configureSockets
 import io.ktor.server.application.Application
 import io.ktor.server.application.install
 import org.koin.ktor.plugin.Koin
@@ -16,6 +18,8 @@ fun Application.module() {
         modules(mainModule)
     }
     configureSerialization()
+    configureSockets()
+    configureSecurity()
     configureCustomRouting()
 }
 

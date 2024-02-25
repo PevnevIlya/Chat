@@ -1,11 +1,13 @@
 package com.example.myapplication.presentation.main
 
-import android.annotation.SuppressLint
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.util.Base64
 import android.util.Log
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -14,12 +16,12 @@ import com.example.myapplication.data.models.UserModel
 import com.example.myapplication.data.room.UserDao
 import com.google.gson.Gson
 import dagger.hilt.android.lifecycle.HiltViewModel
-import io.ktor.client.call.body
+import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
+import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import java.io.ByteArrayInputStream
 import javax.inject.Inject
 
 @HiltViewModel
@@ -29,6 +31,7 @@ class MainViewModel  @Inject constructor(
 ): ViewModel() {
     var user by mutableStateOf(UserModel("", "", ""))
     var companion by mutableStateOf(UserModel("", "", ""))
+    val loadedBitmap = mutableStateOf<Bitmap?>(null)
 
     init {
        refreshUserInfo()
@@ -36,6 +39,16 @@ class MainViewModel  @Inject constructor(
     override fun onCleared() {
         super.onCleared()
         Log.d("ViewModel", "Main VM Cleared")
+    }
+
+    @OptIn(DelicateCoroutinesApi::class)
+    fun loadImageFromServer(base64String: String, bitmapState: MutableState<Bitmap?>) {
+        GlobalScope.launch(Dispatchers.Main) {
+            val byteArray = Base64.decode(base64String, Base64.DEFAULT)
+            val inputStream = ByteArrayInputStream(byteArray)
+            val bitmap = BitmapFactory.decodeStream(inputStream)
+            bitmapState.value = bitmap
+        }
     }
 
     fun refreshUserInfo() {
@@ -53,6 +66,7 @@ class MainViewModel  @Inject constructor(
             user.name = userResult.name
             user.status = userResult.status
             user.photoUrl = userResult.photoUrl
+            loadImageFromServer(userResult.photoUrl ?: "empty", loadedBitmap)
             Log.d("ChangeInfo", "userModel2 is $user")
             getCompanionList(emailRes.await())
         }

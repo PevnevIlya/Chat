@@ -71,7 +71,7 @@ fun MainScreen(
         )
     )
     if(viewModel.goToSingleChat != "null"){
-        navController.navigate("${Screens.SingleChatScreen.route}/${viewModel.goToSingleChat}")
+        navController.navigate("${Screens.SingleChatScreen.route}/${viewModel.goToSingleChat}/${viewModel.user.email}")
     }
     if(viewModel.goToChangeInfoActivity){
         navController.navigate(Screens.ChangeInfoScreen.route)

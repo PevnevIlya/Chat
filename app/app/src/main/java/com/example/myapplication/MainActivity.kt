@@ -10,6 +10,7 @@ import com.example.myapplication.presentation.navigation.Navigation
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         setContent {
             Navigation()
         }

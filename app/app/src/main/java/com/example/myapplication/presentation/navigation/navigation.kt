@@ -39,10 +39,13 @@ fun Navigation(){
             AddCompanionScreen(navController = navController)
         }
         composable(
-            "${Screens.SingleChatScreen.route}/{companionEmail}",
-            arguments = listOf(navArgument("companionEmail") { type = NavType.StringType })) {
+            "${Screens.SingleChatScreen.route}/{companionEmail}/{email}",
+            arguments = listOf(
+                navArgument("companionEmail") { type = NavType.StringType },
+                navArgument("email") { type = NavType.StringType})) {
             val companionEmail = it.arguments?.getString("companionEmail") ?: "null"
-            SingleChat(navController = navController, companionEmail = companionEmail)
+            val email = it.arguments?.getString("email") ?: "null"
+            SingleChat(navController = navController, companionEmail = companionEmail, email = email)
         }
     }
 }

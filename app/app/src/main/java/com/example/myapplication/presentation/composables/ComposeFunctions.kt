@@ -1,14 +1,11 @@
 package com.example.myapplication.presentation.composables
 
-import androidx.compose.foundation.Image
+import android.graphics.Bitmap
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -25,8 +22,8 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
@@ -40,7 +37,6 @@ import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
-import com.example.myapplication.R
 
 @Composable
 fun DefaultText(
@@ -107,7 +103,7 @@ fun LoadingScreen(){
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color.Black),
+            .background(androidx.compose.ui.graphics.Color.Black),
         contentAlignment = Alignment.Center
     ) {
         CircularProgressIndicator(
@@ -118,7 +114,7 @@ fun LoadingScreen(){
 }
 
 @Composable
-fun CardWithImageAndText(imageUrl: String, text1: String, text2: String, action: () -> Unit) {
+fun CardWithImageAndText(bitmap: Bitmap, text1: String, text2: String, action: () -> Unit) {
     Card(
         modifier = Modifier
             .padding(16.dp)
@@ -127,7 +123,7 @@ fun CardWithImageAndText(imageUrl: String, text1: String, text2: String, action:
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
             AsyncImage(
-                model = imageUrl,
+                model = bitmap,
                 contentDescription = "Photo",
                 modifier = Modifier
                     .size(150.dp)

@@ -40,6 +40,7 @@ dependencies {
 
     //websockets
     implementation("io.ktor:ktor-server-websockets:$ktor_version")
+    implementation("io.ktor:ktor-server-sessions:$ktor_version")
 
     // KMongo
     implementation("org.litote.kmongo:kmongo:$kmongo_version")

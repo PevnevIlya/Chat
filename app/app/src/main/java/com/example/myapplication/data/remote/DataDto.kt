@@ -27,3 +27,8 @@ data class AddCompanionDto(
     val email: String,
     val companionEmail: String
 )
+
+@Serializable
+data class GetAllMessagesDto(
+    val chatId: String
+)

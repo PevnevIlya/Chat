@@ -10,7 +10,6 @@ import com.example.myapplication.data.room.UserDao
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
-import kotlinx.coroutines.invoke
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 

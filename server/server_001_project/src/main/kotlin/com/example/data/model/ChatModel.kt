@@ -4,6 +4,13 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class ChatModel(
-    val messages: List<MessageModel>,
+    val user1Email: String,
+    val user2Email: String,
+    val messages: MutableList<MessageModel>,
     val id: String
+)
+
+@Serializable
+data class ChatIdReceive(
+    val chatId: String
 )

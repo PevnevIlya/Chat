@@ -1,18 +1,18 @@
 package com.example.myapplication.di
 
 import android.content.Context
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.room.Room
 import com.example.myapplication.data.implementations.ChangeInfoServiceImplementation
 import com.example.myapplication.data.implementations.LoginServiceImplementation
 import com.example.myapplication.data.implementations.RegistrationServiceImplementation
+import com.example.myapplication.data.implementations.SingleChatServiceImplementation
 import com.example.myapplication.data.room.CompanionDao
 import com.example.myapplication.data.room.CompanionDatabase
 import com.example.myapplication.data.room.UserDao
 import com.example.myapplication.data.room.UserDatabase
+import com.example.myapplication.domain.interfaces.SingleChatService
 import com.example.myapplication.domain.usecases.validate.email.ValidateEmail
 import com.example.myapplication.domain.usecases.validate.password.ValidatePassword
-import com.example.myapplication.presentation.registration.RegistrationViewModel
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -102,5 +102,11 @@ object AppModule {
     @Singleton
     fun provideValidatePassword(): ValidatePassword {
         return ValidatePassword()
+    }
+
+    @Provides
+    @Singleton
+    fun provideSingleChatService(client: HttpClient): SingleChatService {
+        return SingleChatServiceImplementation(client)
     }
 }

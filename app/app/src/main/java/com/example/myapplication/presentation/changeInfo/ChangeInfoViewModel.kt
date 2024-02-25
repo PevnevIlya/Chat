@@ -1,22 +1,26 @@
 package com.example.myapplication.presentation.changeInfo
 
-import android.net.Uri
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.util.Base64
 import android.util.Log
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.core.net.toUri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.myapplication.data.implementations.ChangeInfoServiceImplementation
 import com.example.myapplication.data.models.UserModel
 import com.example.myapplication.data.room.UserDao
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
-import java.net.URL
+import java.io.ByteArrayInputStream
 import javax.inject.Inject
 
 @HiltViewModel
@@ -25,8 +29,20 @@ class ChangeInfoViewModel @Inject constructor(
     private val dao: UserDao
 ): ViewModel() {
     var user by mutableStateOf(UserModel("", "", ""))
+    val loadedBitmap = mutableStateOf<Bitmap?>(null)
     init {
         refreshUserInfo()
+
+    }
+
+    @OptIn(DelicateCoroutinesApi::class)
+    fun loadImageFromServer(base64String: String, bitmapState: MutableState<Bitmap?>) {
+        GlobalScope.launch(Dispatchers.Main) {
+            val byteArray = Base64.decode(base64String, Base64.DEFAULT)
+            val inputStream = ByteArrayInputStream(byteArray)
+            val bitmap = BitmapFactory.decodeStream(inputStream)
+            bitmapState.value = bitmap
+        }
     }
 
     fun refreshUserInfo(){
@@ -44,9 +60,11 @@ class ChangeInfoViewModel @Inject constructor(
             user.name = userResult.name
             user.status = userResult.status
             user.photoUrl = userResult.photoUrl
+            loadImageFromServer(userResult.photoUrl ?: "empty", loadedBitmap)
             Log.d("ChangeInfo", "userModel is $user")
         }
     }
+
 
     fun onValueChanged(event: ChangeInfoEvent){
         when (event) {
@@ -85,7 +103,7 @@ class ChangeInfoViewModel @Inject constructor(
 
     private fun submitData(){
         viewModelScope.launch(Dispatchers.IO) {
-            Log.d("Server", "user is $user")
+            Log.d("ServerTest", "user is $user")
             changeInfo.changeUserInfo(user.email, user.name.toString(), user.status.toString(), user.photoUrl.toString())
         }
     }

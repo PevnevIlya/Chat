@@ -1,8 +1,11 @@
 package com.example.di
 
+import com.example.data.controllers.RoomController
 import com.example.data.controllers.UserController
+import com.example.data.implementations.ChatInterfaceImpl
 import com.example.data.implementations.UserInfoRepositoryImpl
 import com.example.data.implementations.UserRepositoryImpl
+import com.example.data.interfaces.ChatInterface
 import org.koin.dsl.module
 import org.litote.kmongo.coroutine.CoroutineDatabase
 import org.litote.kmongo.coroutine.coroutine
@@ -22,5 +25,11 @@ val mainModule = module {
     }
     single {
         UserInfoRepositoryImpl(get())
+    }
+    single<ChatInterface> {
+        ChatInterfaceImpl(get())
+    }
+    single {
+        RoomController(get())
     }
 }

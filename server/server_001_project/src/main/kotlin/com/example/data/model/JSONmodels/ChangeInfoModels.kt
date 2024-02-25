@@ -27,4 +27,9 @@ data class AddCompanionReceiveRemote(
 data class GetUserCompanionsRemote(
     val list: MutableList<String>
 )
+@Serializable
+data class GetChatIdReceive(
+    val email: String,
+    val companionEmail: String
+)
 

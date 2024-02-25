@@ -1,11 +1,14 @@
 package com.example.data.controllers
 
+import com.example.data.model.ChatModel
 import com.example.data.model.JSONmodels.AddCompanionReceiveRemote
 import com.example.data.model.JSONmodels.ChangeInfoReceiveRemote
 import com.example.data.model.JSONmodels.ChangeInfoResponseRemote
+import com.example.data.model.JSONmodels.GetChatIdReceive
 import com.example.data.model.JSONmodels.GetUserCompanionsRemote
 import com.example.data.model.JSONmodels.ReceiveRemote
 import com.example.data.model.UserModel
+import com.example.utils.CHATS_COLLECTION
 import com.example.utils.USERS_COLLECTION
 import com.example.utils.validators.isValidEmail
 import io.ktor.http.HttpStatusCode
@@ -92,12 +95,29 @@ class UserController(
 
     suspend fun addCompanion(call: ApplicationCall) {
         val receive = call.receive<AddCompanionReceiveRemote>()
-        val collection = db.getCollection<UserModel>(USERS_COLLECTION)
-        val user = collection.findOne(UserModel::email eq receive.email)
+        val usersCollection = db.getCollection<UserModel>(USERS_COLLECTION)
+        val chatsCollection = db.getCollection<ChatModel>(CHATS_COLLECTION)
+        val user = usersCollection.findOne(UserModel::email eq receive.email)
+        val companionUser = usersCollection.findOne(UserModel::email eq receive.companionEmail)
+        val uid = UUID.randomUUID().toString()
 
-        if(user != null) {
-            user.companionEmails.add(receive.companionEmail)
-            collection.updateOne(UserModel::email eq receive.email, user)
+        if(user != null && companionUser != null) {
+            if(!user.companionEmails.contains(receive.companionEmail)) {
+
+                user.companionEmails.add(companionUser.email)
+                companionUser.companionEmails.add(user.email)
+
+                val chat = ChatModel(id = uid, messages = mutableListOf(), user1Email = user.email, user2Email = companionUser.email)
+                chatsCollection.insertOne(chat)
+
+                user.chats.add(chat.id)
+                companionUser.chats.add(chat.id)
+
+                usersCollection.updateOne(UserModel::email eq user.email, user)
+                usersCollection.updateOne(UserModel::email eq companionUser.email, companionUser)
+            }else{
+                call.respond(HttpStatusCode.Conflict, "User already added")
+            }
         } else {
             call.respond(HttpStatusCode.NotFound, "User not found")
         }
@@ -110,6 +130,19 @@ class UserController(
 
         if(user != null) {
             val result = GetUserCompanionsRemote(user.companionEmails)
+            call.respond(HttpStatusCode.OK, result)
+        } else {
+            call.respond(HttpStatusCode.NotFound, "User not found")
+        }
+    }
+    suspend fun getChatId(call: ApplicationCall) {
+        val receive = call.receive<GetChatIdReceive>()
+        val usersCollection = db.getCollection<UserModel>(USERS_COLLECTION)
+        val user = usersCollection.findOne(UserModel::email eq receive.email)
+
+        if(user != null) {
+            val index = user.companionEmails.indexOfFirst { email -> email == receive.companionEmail }
+            val result = user.chats[index]
             call.respond(HttpStatusCode.OK, result)
         } else {
             call.respond(HttpStatusCode.NotFound, "User not found")

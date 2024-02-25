@@ -1,5 +1,6 @@
 package com.example.myapplication.domain.interfaces
 
+import android.net.Uri
 import com.example.myapplication.data.models.UserModel
 import com.example.myapplication.data.room.User
 
