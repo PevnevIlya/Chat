@@ -20,6 +20,7 @@ import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.async
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.io.ByteArrayInputStream
 import javax.inject.Inject
@@ -36,6 +37,7 @@ class MainViewModel  @Inject constructor(
     init {
        refreshUserInfo()
     }
+
     override fun onCleared() {
         super.onCleared()
         Log.d("ViewModel", "Main VM Cleared")
@@ -53,22 +55,36 @@ class MainViewModel  @Inject constructor(
 
     fun refreshUserInfo() {
         viewModelScope.launch(Dispatchers.Main) {
-            val emailRes = viewModelScope.async(Dispatchers.IO) {
-                dao.getUser()[0].email
+            try {
+                val emailRes = viewModelScope.async(Dispatchers.IO) {
+                    dao.getUser()[0].email
+                }
+                Log.d("ChangeInfo", emailRes.await())
+
+                val userModel = viewModelScope.async(Dispatchers.IO) {
+                    changeInfo.getUserInfo(emailRes.await())
+                }
+                val userResult = userModel.await()
+                Log.d("ChangeInfo", "user2 is $userResult")
+
+                if (userModel.await() != UserModel("", "", "")) {
+                    user.email = emailRes.await()
+                    user.name = userResult.name
+                    user.status = userResult.status
+                    user.photoUrl = userResult.photoUrl
+                    loadImageFromServer(userResult.photoUrl ?: "empty", loadedBitmap)
+                    Log.d("ChangeInfo", "userModel2 is $user")
+                    getCompanionList(emailRes.await())
+                } else {
+                    Log.e("ChangeInfo", "Failed to retrieve user info")
+                    delay(5000)
+                    refreshUserInfo()
+                }
+            } catch (e: Exception) {
+                Log.e("ChangeInfo", "An error occurred: ${e.message}")
+                delay(5000)
+                refreshUserInfo()
             }
-            Log.d("ChangeInfo", emailRes.await())
-            val userModel = viewModelScope.async(Dispatchers.IO) {
-                changeInfo.getUserInfo(emailRes.await())
-            }
-            val userResult = userModel.await()
-            Log.d("ChangeInfo", "user2 is $userResult")
-            user.email = emailRes.await()
-            user.name = userResult.name
-            user.status = userResult.status
-            user.photoUrl = userResult.photoUrl
-            loadImageFromServer(userResult.photoUrl ?: "empty", loadedBitmap)
-            Log.d("ChangeInfo", "userModel2 is $user")
-            getCompanionList(emailRes.await())
         }
     }
     suspend fun getUserInfo(keyEmail: String): UserModel {
@@ -89,6 +105,7 @@ class MainViewModel  @Inject constructor(
             val listResult = gson.fromJson(stringResult, ListResponse::class.java)
             Log.d("ChangeUserInfoBody", "listResult = $listResult")
             user.companionsList = listResult.list
+            selectedItemIndex = 0
         }
     }
 
@@ -98,6 +115,6 @@ class MainViewModel  @Inject constructor(
 
     var goToSingleChat by mutableStateOf("null")
 
-    var selectedItemIndex by mutableIntStateOf(0)
+    var selectedItemIndex by mutableIntStateOf(-1)
 }
 data class ListResponse(val list: MutableList<String>)

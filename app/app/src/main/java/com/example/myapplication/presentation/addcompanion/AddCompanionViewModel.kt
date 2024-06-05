@@ -1,5 +1,6 @@
 package com.example.myapplication.presentation.addcompanion
 
+import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -19,6 +20,7 @@ class AddCompanionViewModel @Inject constructor(
     private val dao: UserDao
 ): ViewModel() {
     var isLoading by mutableStateOf(false)
+    var isAdded by mutableStateOf(false)
     var needToGoBack by mutableStateOf(false)
     var editValue by mutableStateOf("")
 
@@ -31,10 +33,11 @@ class AddCompanionViewModel @Inject constructor(
             val result = viewModelScope.async(Dispatchers.IO) {
                 changeInfo.addCompanion(emailRes.await(), editValue)
             }
-            if(result.await() == "OK"){
+            Log.d("Mytest", result.await())
+            if(result.await() == ""){
                 isLoading = false
                 needToGoBack = true
-            } else {
+            } else if(result.await() == "User already added"){
                 isLoading = false
             }
         }

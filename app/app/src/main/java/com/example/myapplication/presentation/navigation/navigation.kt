@@ -1,6 +1,8 @@
 package com.example.myapplication.presentation.navigation
 
+import android.content.Context
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -14,6 +16,7 @@ import com.example.myapplication.presentation.login.LoginScreen
 import com.example.myapplication.presentation.main.MainScreen
 import com.example.myapplication.presentation.registration.RegistrationScreen
 import com.example.myapplication.presentation.singlechat.SingleChat
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.withContext
@@ -33,7 +36,8 @@ fun Navigation(){
             LoginScreen(navController = navController)
         }
         composable(Screens.ChangeInfoScreen.route){
-            ChangeInfoScreen(navController = navController)
+            val applicationContext = LocalContext.current.applicationContext
+            ChangeInfoScreen(context = applicationContext,navController = navController)
         }
         composable(Screens.AddCompanionScreen.route){
             AddCompanionScreen(navController = navController)

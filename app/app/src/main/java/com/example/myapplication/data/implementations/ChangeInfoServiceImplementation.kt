@@ -33,18 +33,27 @@ class ChangeInfoServiceImplementation(
     @RequiresApi(Build.VERSION_CODES.O)
     override suspend fun changeUserInfo(email: String, name: String, status: String, photoUrl: String) {
         try {
-            val path = getPathFromUri(context, photoUrl.toUri())
-            Log.d("NewUri", "Path $path")
-            val file = convertFileToByteArray(path.toString())
-            Log.d("NewUri", "File ${file.toString()}")
-            val res = byteArrayToBase64(file)
-            Log.d("NewUri", "Res $res")
-            val response = client.post(ChangeInfoService.Endpoints.ChangeUserInfo.url){
+            if(photoUrl.length < 200) {
+                val path = getPathFromUri(context, photoUrl.toUri())
+                Log.d("NewUri", "Path $path")
+                val file = convertFileToByteArray(path.toString())
+                Log.d("NewUri", "File ${file.toString()}")
+                val res = byteArrayToBase64(file)
+                Log.d("NewUri", "Res $res")
+                val response = client.post(ChangeInfoService.Endpoints.ChangeUserInfo.url){
+                    contentType(ContentType.Application.Json)
+                    setBody(ChangeDto(email, name, status, res))
+                }
+                Log.d("ServerTest", response.toString())
+                Log.d("ServerTest", response.body())
+            } else {
+            val response = client.post(ChangeInfoService.Endpoints.ChangeUserInfo.url) {
                 contentType(ContentType.Application.Json)
-                setBody(ChangeDto(email, name, status, res))
+                setBody(ChangeDto(email, name, status, photoUrl))
+                }
+                Log.d("ServerTest", response.toString())
+                Log.d("ServerTest", response.body())
             }
-            Log.d("ServerTest", response.toString())
-            Log.d("ServerTest", response.body())
         } catch (e: Exception) {
             e.printStackTrace()
         }

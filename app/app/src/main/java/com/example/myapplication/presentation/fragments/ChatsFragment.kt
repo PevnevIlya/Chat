@@ -1,6 +1,8 @@
 package com.example.myapplication.presentation.fragments
 
 import android.graphics.Bitmap
+import android.util.Log
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.runtime.Composable
@@ -15,7 +17,8 @@ import com.example.myapplication.presentation.main.MainViewModel
 
 @Composable
 fun ChatsScreen(
-    viewModel: MainViewModel
+    viewModel: MainViewModel,
+    innerPadding: PaddingValues
 ){
     val placeholderColor = Color.Gray
     val placeholderBitmap = remember {
@@ -23,7 +26,12 @@ fun ChatsScreen(
             eraseColor(placeholderColor.toArgb())
         }
     }
-    LazyColumn {
+    Log.d("Coroutines", viewModel.user.companionsList.toString())
+    LazyColumn(
+        contentPadding = PaddingValues(
+            bottom = innerPadding.calculateBottomPadding()
+        )
+    ) {
         items(viewModel.user.companionsList) { item ->
             val user = remember(item) { mutableStateOf<UserModel?>(null) }
             val newBitmap = remember(item) { mutableStateOf<Bitmap?>(null) }

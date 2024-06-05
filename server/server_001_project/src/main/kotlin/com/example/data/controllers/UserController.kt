@@ -7,8 +7,10 @@ import com.example.data.model.JSONmodels.ChangeInfoResponseRemote
 import com.example.data.model.JSONmodels.GetChatIdReceive
 import com.example.data.model.JSONmodels.GetUserCompanionsRemote
 import com.example.data.model.JSONmodels.ReceiveRemote
+import com.example.data.model.PhotoModel
 import com.example.data.model.UserModel
 import com.example.utils.CHATS_COLLECTION
+import com.example.utils.PHOTO_COLLECTION
 import com.example.utils.USERS_COLLECTION
 import com.example.utils.validators.isValidEmail
 import io.ktor.http.HttpStatusCode
@@ -66,12 +68,16 @@ class UserController(
     suspend fun changeUserInfo(call: ApplicationCall){
         val receive = call.receive<ChangeInfoReceiveRemote>()
         val collection = db.getCollection<UserModel>(USERS_COLLECTION)
+        val photoCollection = db.getCollection<PhotoModel>(PHOTO_COLLECTION)
         val user = collection.findOne(UserModel::email eq receive.email)
 
         if(user != null) {
+            val url = UUID.randomUUID().toString()
             user.username = receive.name
             user.status = receive.status
-            user.photoUrl = receive.photoUrl
+            user.photoUrl = url
+
+            photoCollection.insertOne(PhotoModel(url, receive.photoUrl))
 
             collection.updateOne(UserModel::email eq receive.email, user)
             call.respond(HttpStatusCode.OK, "User updated")
@@ -83,16 +89,17 @@ class UserController(
     suspend fun getUserInfo(call: ApplicationCall){
         val receive = call.receive<ChangeInfoReceiveRemote>()
         val collection = db.getCollection<UserModel>(USERS_COLLECTION)
+        val photoCollection = db.getCollection<PhotoModel>(PHOTO_COLLECTION)
         val user = collection.findOne(UserModel::email eq receive.email)
 
         if(user != null) {
-            val result = ChangeInfoResponseRemote(user.username, user.status, user.photoUrl)
+            val base64photo = photoCollection.findOne(PhotoModel::url eq user.photoUrl)
+            val result = ChangeInfoResponseRemote(user.username, user.status, base64photo?.base64 ?: "")
             call.respond(HttpStatusCode.OK, result)
         } else {
             call.respond(HttpStatusCode.NotFound, "User not found")
         }
     }
-
     suspend fun addCompanion(call: ApplicationCall) {
         val receive = call.receive<AddCompanionReceiveRemote>()
         val usersCollection = db.getCollection<UserModel>(USERS_COLLECTION)
@@ -101,7 +108,12 @@ class UserController(
         val companionUser = usersCollection.findOne(UserModel::email eq receive.companionEmail)
         val uid = UUID.randomUUID().toString()
 
+
+
         if(user != null && companionUser != null) {
+            if(user.email == receive.companionEmail){
+                call.respond(HttpStatusCode.Conflict, "Your email")
+            }
             if(!user.companionEmails.contains(receive.companionEmail)) {
 
                 user.companionEmails.add(companionUser.email)

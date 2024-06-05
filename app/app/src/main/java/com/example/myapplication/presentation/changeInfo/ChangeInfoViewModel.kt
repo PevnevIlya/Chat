@@ -2,8 +2,10 @@ package com.example.myapplication.presentation.changeInfo
 
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.os.Build
 import android.util.Base64
 import android.util.Log
+import androidx.annotation.RequiresApi
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -66,6 +68,7 @@ class ChangeInfoViewModel @Inject constructor(
     }
 
 
+    @RequiresApi(Build.VERSION_CODES.O)
     fun onValueChanged(event: ChangeInfoEvent){
         when (event) {
             is ChangeInfoEvent.NameChanged -> {
@@ -101,10 +104,12 @@ class ChangeInfoViewModel @Inject constructor(
         }
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     private fun submitData(){
         viewModelScope.launch(Dispatchers.IO) {
             Log.d("ServerTest", "user is $user")
-            changeInfo.changeUserInfo(user.email, user.name.toString(), user.status.toString(), user.photoUrl.toString())
+            changeInfo.changeUserInfo(user.email, user.name, user.status, user.photoUrl ?: "empty")
+
         }
     }
 }

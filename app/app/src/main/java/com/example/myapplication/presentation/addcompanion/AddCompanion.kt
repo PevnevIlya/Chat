@@ -1,5 +1,6 @@
 package com.example.myapplication.presentation.addcompanion
 
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -13,6 +14,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.ViewModel
@@ -28,8 +30,14 @@ fun AddCompanionScreen(
     navController: NavController,
     viewModel: AddCompanionViewModel = hiltViewModel()
 ) {
+    val context = LocalContext.current
     if(viewModel.needToGoBack) {
+        Toast.makeText(context, "User succesfully added!", Toast.LENGTH_LONG).show()
         navController.navigate(Screens.MainScreen.route)
+    }
+    if(viewModel.isAdded) {
+        Toast.makeText(context, "User already added!", Toast.LENGTH_LONG).show()
+        viewModel.isAdded = false
     }
     if(viewModel.isLoading) {
         LoadingScreen()
@@ -45,7 +53,7 @@ fun AddCompanionScreen(
                     modifier = Modifier
                         .height(20.dp)
                         .width(150.dp),
-                    text = "Enter your friend email..",
+                    text = "Enter email..",
                     color = Color.Gray,
                     value = viewModel.editValue,
                     onValueChange = {

@@ -22,6 +22,7 @@ class RegistrationServiceImplementation(
             return response.body()
         } catch (e: Exception) {
             e.printStackTrace()
+            Log.d("Aboba", e.toString())
             e.toString()
         }
     }

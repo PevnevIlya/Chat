@@ -1,9 +1,13 @@
 package com.example.myapplication.presentation.changeInfo
 
+import android.content.Context
+import android.graphics.BitmapFactory
 import android.net.Uri
+import android.os.Build
 import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -49,8 +53,10 @@ import java.net.URL
 import java.sql.Blob
 import kotlin.coroutines.coroutineContext
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun ChangeInfoScreen(
+    context: Context,
     navController: NavController,
     viewModel: ChangeInfoViewModel = hiltViewModel()
 ){
@@ -63,6 +69,14 @@ fun ChangeInfoScreen(
         contract = ActivityResultContracts.GetContent(),
         onResult = { uri -> if(uri != null){
             selectedImageUri.value = uri
+            val contentResolver = context.contentResolver
+            val bitmap = try {
+                BitmapFactory.decodeStream(contentResolver.openInputStream(uri))
+            } catch (e: IOException) {
+                e.printStackTrace()
+                null
+            }
+            viewModel.loadedBitmap.value = bitmap
             Log.d("NewUri", uri.toString())
             viewModel.onValueChanged(ChangeInfoEvent.PhotoUrlChanged(uri.toString()))} }
     )

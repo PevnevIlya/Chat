@@ -5,6 +5,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.runtime.toMutableStateList
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -34,6 +35,7 @@ class SingleChatViewModel @Inject constructor(
     private val _toastEvent = MutableSharedFlow<String>()
     val toastEvent = _toastEvent.asSharedFlow()
     var companion by mutableStateOf(UserModel(""))
+    var isEncrypted = mutableStateOf(false)
 
     fun startActivity(email: String, companionEmail: String) {
         viewModelScope.launch {
@@ -104,5 +106,81 @@ class SingleChatViewModel @Inject constructor(
     override fun onCleared() {
         super.onCleared()
         disconnect()
+    }
+
+    fun shiftMessageText() {
+        val updatedMessages = messageList.map { message ->
+            message.copy(text = shiftString(message.text))
+        }
+        messageText.value = shiftString(messageText.value)
+        messageList = updatedMessages.toMutableStateList()
+    }
+
+    fun restoreMessageText(shiftAmount: Int = 10) {
+        val updatedMessages = messageList.map { message ->
+            message.copy(text = unshiftString(message.text))
+        }
+        messageText.value = unshiftString(messageText.value)
+        messageList = updatedMessages.toMutableStateList()
+    }
+
+    fun shiftString(input: String): String {
+        val sb = StringBuilder()
+        for (char in input) {
+            if (char.isLetter()) {
+                var shiftedChar = char.code + 10
+                if (char.isUpperCase()) {
+                    when {
+                        char in 'А'..'Я' -> shiftedChar = (shiftedChar - 1040) % 32 + 1040
+                        char in 'A'..'Z' -> shiftedChar = (shiftedChar - 65) % 26 + 65
+                    }
+                } else {
+                    when {
+                        char in 'а'..'я' -> shiftedChar = (shiftedChar - 1072) % 32 + 1072
+                        char in 'a'..'z' -> shiftedChar = (shiftedChar - 97) % 26 + 97
+                    }
+                }
+                sb.append(shiftedChar.toChar())
+            } else {
+                sb.append(char)
+            }
+        }
+        return sb.toString()
+    }
+
+    fun unshiftString(input: String): String {
+        val sb = StringBuilder()
+        for (char in input) {
+            if (char.isLetter()) {
+                var shiftedChar = char.code - 10
+                if (char.isUpperCase()) {
+                    when {
+                        char in 'А'..'Я' -> shiftedChar = when {
+                            shiftedChar < 1040 -> shiftedChar + 32
+                            else -> shiftedChar
+                        }
+                        char in 'A'..'Z' -> shiftedChar = when {
+                            shiftedChar < 65 -> shiftedChar + 26
+                            else -> shiftedChar
+                        }
+                    }
+                } else {
+                    when {
+                        char in 'а'..'я' -> shiftedChar = when {
+                            shiftedChar < 1072 -> shiftedChar + 32
+                            else -> shiftedChar
+                        }
+                        char in 'a'..'z' -> shiftedChar = when {
+                            shiftedChar < 97 -> shiftedChar + 26
+                            else -> shiftedChar
+                        }
+                    }
+                }
+                sb.append(shiftedChar.toChar())
+            } else {
+                sb.append(char)
+            }
+        }
+        return sb.toString()
     }
 }

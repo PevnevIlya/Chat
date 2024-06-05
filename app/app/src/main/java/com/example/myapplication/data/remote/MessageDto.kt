@@ -1,5 +1,6 @@
 package com.example.myapplication.data.remote
 
+import com.example.myapplication.MessageType
 import com.example.myapplication.data.models.MessageModel
 import kotlinx.serialization.Serializable
 import java.text.DateFormat

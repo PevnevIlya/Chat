@@ -7,6 +7,8 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.myapplication.data.implementations.LoginServiceImplementation
+import com.example.myapplication.data.room.User
+import com.example.myapplication.data.room.UserDao
 import com.example.myapplication.domain.usecases.validate.email.ValidateEmail
 import com.example.myapplication.domain.usecases.validate.password.ValidatePassword
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -20,7 +22,8 @@ import javax.inject.Inject
 class LoginViewModel @Inject constructor(
     private val loginService: LoginServiceImplementation,
     private val validateEmail: ValidateEmail,
-    private val validatePassword: ValidatePassword
+    private val validatePassword: ValidatePassword,
+    private val dao: UserDao
 ): ViewModel() {
     var state by mutableStateOf(LoginFormState())
 
@@ -76,6 +79,7 @@ class LoginViewModel @Inject constructor(
             if (answer != "Success") {
                 validationEventChannel.send(LoginViewModel.ValidationEvent.Fail)
             } else {
+                dao.upsertUser(User(email = state.email, password = state.password))
                 validationEventChannel.send(LoginViewModel.ValidationEvent.Success)
             }
         }

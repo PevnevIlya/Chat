@@ -23,6 +23,7 @@ import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -30,6 +31,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import com.example.myapplication.presentation.composables.LoadingScreen
 import com.example.myapplication.presentation.fragments.ChatsScreen
 import com.example.myapplication.presentation.fragments.ProfileScreen
 import com.example.myapplication.presentation.fragments.SettingsScreen
@@ -54,8 +56,7 @@ fun MainScreen(
             title = "Chats",
             image = Icons.Filled.Email,
             unselectedImage = Icons.Outlined.Email,
-            hasNews = false,
-            badgeCount = 45
+            hasNews = false
         ),
         BottomNavigationItem(
             title = "Profile",
@@ -91,7 +92,7 @@ fun MainScreen(
                             BadgedBox(badge = {
                                 if(item.badgeCount != null){
                                     Badge {
-                                        Text(text = item.badgeCount.toString())
+                                        //Text(text = item.badgeCount.toString())
                                     }
                                 } else if(item.hasNews){
                                     Badge {
@@ -108,8 +109,9 @@ fun MainScreen(
                 }
             }
         }
-        ) {
-        if(viewModel.selectedItemIndex == 0) ChatsScreen(viewModel)
+        ) { innerPadding ->
+        if(viewModel.selectedItemIndex == -1) LoadingScreen()
+        if(viewModel.selectedItemIndex == 0) ChatsScreen(viewModel, innerPadding)
         if(viewModel.selectedItemIndex == 1) ProfileScreen(viewModel)
         if(viewModel.selectedItemIndex == 2) SettingsScreen(viewModel)
     }
